@@ -16,14 +16,17 @@ public class Launcher extends JFrame{
 	private static final long serialVersionUID = -3444205831495972681L;
 	public static String versionurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
 	public static String downloadurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 1;
+	public static int version = 2;
 	public static Launcher instance;
 
 	public static void main(String[] args) {
 		instance = new Launcher();
 		instance.setVisible(false);
 		String arg = "ok";
-		if(getGame().exists() && getFileVersion().exists()) {
+		if(!canConnect()) {
+			arg = "offline";
+		}
+		else if(getGame().exists() && getFileVersion().exists()) {
 			getGame().getParentFile().mkdirs();
 			String version = getVersion();
 			String actual = getActualVersion();
@@ -114,6 +117,15 @@ public class Launcher extends JFrame{
 			e.printStackTrace();
 		}
 		return version;
+	}
+	
+	public static boolean canConnect() {
+		try {
+			new BufferedReader(new InputStreamReader(new URL(versionurl).openStream()));
+			return true;
+		}catch (Exception e){
+			return false;
+		}
 	}
 
 }
