@@ -16,25 +16,25 @@ public class Launcher extends JFrame{
 	private static final long serialVersionUID = -3444205831495972681L;
 	public static String versionurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
 	public static String downloadurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 2;
+	public static int version = 4;
 	public static Launcher instance;
+	public static String actual = "";
 
 	public static void main(String[] args) {
 		instance = new Launcher();
 		instance.setVisible(false);
 		String arg = "ok";
-		if(!canConnect()) {
+		if(!getActualVersion()) {
 			arg = "offline";
 		}
 		else if(getGame().exists() && getFileVersion().exists()) {
 			getGame().getParentFile().mkdirs();
 			String version = getVersion();
-			String actual = getActualVersion();
 			if(!version.equals(actual)) {
-				if(!Download.update("Mise à jour en cours...", getActualVersion())) {
+				if(!Download.update("Mise à jour en cours...", actual.replace(" ",""))) {
 					return;
 				}
-				setVersion(getActualVersion());
+				setVersion(actual);
 				arg = "update";
 			}
 		} else {
@@ -42,13 +42,13 @@ public class Launcher extends JFrame{
 			if(!Download.update("Téléchargement des fichiers...","")) {
 				return;
 			}
-			setVersion(getActualVersion());
+			setVersion(actual);
 			arg = "install";
 			JOptionPane.showMessageDialog(instance, "Téléchargement du jeu effectué, vous devez maintenant relancer le jeu","Information",JOptionPane.INFORMATION_MESSAGE);
 		}
 		try {
 			if(!arg.equals("install"))
-				Runtime.getRuntime().exec("java -jar "+getGame()+" "+version+" "+arg);
+				Runtime.getRuntime().exec("java -jar "+getGame()+" "+version+" "+arg+" "+getOS());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -65,6 +65,18 @@ public class Launcher extends JFrame{
 		else if (OS.contains("NUX"))
 			return new File(System.getProperty("user.home"),"/.towerminer");
 		return new File(System.getProperty("user.dir"),"/.towerminer");
+	}
+	
+	public static String getOS() {
+		String OS = System.getProperty("os.name").toUpperCase();
+		if (OS.contains("WIN"))
+			return "windows";
+		else if (OS.contains("MAC"))
+			return "mac";
+		else if (OS.contains("NUX"))
+			return "linux";
+		else
+			return "wtf";
 	}
 
 	public static File getMapsDirectory() {
@@ -107,21 +119,13 @@ public class Launcher extends JFrame{
 		return version;
 	}
 
-	public static String getActualVersion() {
+	public static boolean getActualVersion() {
 		String version = "";
 		try {
 			BufferedReader out = new BufferedReader(new InputStreamReader(new URL(versionurl).openStream()));
 			version = out.readLine();
 			out.close();
-		}catch (Exception e){
-			e.printStackTrace();
-		}
-		return version;
-	}
-	
-	public static boolean canConnect() {
-		try {
-			new BufferedReader(new InputStreamReader(new URL(versionurl).openStream()));
+			actual = version;
 			return true;
 		}catch (Exception e){
 			return false;
