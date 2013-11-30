@@ -18,7 +18,7 @@ public class Launcher extends JFrame{
 	private static final long serialVersionUID = -3444205831495972681L;
 	public static String versionurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
 	public static String downloadurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 5;
+	public static int version = 6;
 	public static Launcher instance;
 	public static String actual = "";
 	public static String actualdesc = "";
@@ -34,7 +34,7 @@ public class Launcher extends JFrame{
 			getGame().getParentFile().mkdirs();
 			String version = getVersion();
 			if(!version.equals(actual)) {
-				if(!Download.update("Mise à jour en cours...", actual+"\n"+actualdesc)) {
+				if(!Download.update("Mise à jour "+actual, actualdesc)) {
 					return;
 				}
 				setVersion(actual);
