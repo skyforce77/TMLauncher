@@ -1,5 +1,6 @@
 package fr.skyforce77.towerminer;
 
+import java.beans.IntrospectionException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -10,11 +11,9 @@ import javax.swing.JOptionPane;
 public class Launch {
 
 	public static void launch(String tmversion, String arg) throws Exception{
-		URL[] urls = { Launcher.getGame().toURI().toURL() };
-		@SuppressWarnings("resource")
-		URLClassLoader loader = new URLClassLoader(urls);
-		Class<?> cls = loader.loadClass("fr.skyforce77.towerminer.TowerMiner");
-		if(!launch_A_07(arg, cls) && !launch_A_08(arg, cls)) {
+		addURLToSystemClassLoader(Launcher.getGame().toURI().toURL());
+		Class<?> cls = ClassLoader.getSystemClassLoader().loadClass("fr.skyforce77.towerminer.TowerMiner");
+		if(!launch_A_07(arg, cls) && !launch_A_08(arg, cls) && !launch_B_03(arg, cls)) {
 			JOptionPane.showMessageDialog(null, "Une erreur est survenue,\nelle peut être causée par une mise à jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
 		}
 	}
@@ -38,4 +37,28 @@ public class Launch {
 		}
 		return true;
 	}
+	
+	public static boolean launch_B_03(String arg, Class<?> cls) throws Exception{
+		try {
+			Method main = cls.getDeclaredMethod("startGame", int.class, String.class, String.class, String.class, UUID.class, int.class);
+			main.invoke(cls.newInstance(), new Object[]{Launcher.version,arg,Launcher.getOS(),Data.data.player, Data.data.id, 0});
+		} catch(Exception e) {
+			return false;
+		}
+		return true;
+	}
+	
+	public static void addURLToSystemClassLoader(URL url) throws IntrospectionException { 
+		URLClassLoader systemClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader(); 
+		Class<URLClassLoader> classLoaderClass = URLClassLoader.class; 
+		try { 
+			Method method = classLoaderClass.getDeclaredMethod("addURL", new Class[]{URL.class}); 
+			method.setAccessible(true); 
+			method.invoke(systemClassLoader, new Object[]{url}); 
+		} catch (Throwable t) { 
+			t.printStackTrace(); 
+			throw new IntrospectionException("Error when adding url to system ClassLoader "); 
+		} 
+	}
+	
 }

@@ -1,8 +1,9 @@
 package fr.skyforce77.towerminer;
 
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.Image;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -10,12 +11,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Random;
 
-import javax.swing.JButton;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.UIManager;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
@@ -25,48 +26,56 @@ public class Launcher extends JFrame{
 	private static final long serialVersionUID = -3444205831495972681L;
 	public static String versionurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
 	public static String downloadurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 7;
+	public static int version = 8;
 	public static Launcher instance;
 	public static String actual = "";
 	public static String actualdesc = "";
+	public static LauncherPanel launcherpanel;
+	public static int back = 0;
 
 	public static void main(String[] args) {
 		Data.load();
-		instance = new Launcher();
-		instance.addWindowListener(new java.awt.event.WindowAdapter() {
-			@Override
-			public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-				launch("ok");
-			}
-		});
-		instance.setVisible(false);
-		int changename = JOptionPane.showConfirmDialog (null, "Voulez vous utiliser le pseudo "+Data.data.player+" ?","Pseudo", JOptionPane.YES_NO_OPTION);
-		if(changename == JOptionPane.NO_OPTION) {
-			instance.setSize(new Dimension(300,140));
-			instance.setLocationRelativeTo(null);
-			instance.setTitle("Choix du pseudo");
-			JPanel panel = new JPanel();
-			final JTextField field = new JTextField();
-			field.setPreferredSize(new Dimension(250, 40));
-			field.setDocument(new JTextFieldLimit(12));
-			field.setText(Data.data.player);
-			panel.add(field);
-			JButton valid = new JButton("Valider");
-			valid.setPreferredSize(new Dimension(125, 40));
-			valid.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					Data.data.player = field.getText();
-					instance.setVisible(false);
-					launch("ok");
-				}
-			});
-			panel.add(valid);
-			instance.add(panel);
-			instance.setVisible(true);
-		} else {
-			launch("ok");
+		
+		back = new Random().nextInt(2);
+
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
 		}
+
+		instance = new Launcher();
+		instance.addWindowListener(new WindowListener() {
+			@Override
+			public void windowClosing(WindowEvent arg0) {
+				System.exit(1);
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {}
+
+			@Override
+			public void windowClosed(WindowEvent e) {}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {}
+
+			@Override
+			public void windowIconified(WindowEvent e) {}
+
+			@Override
+			public void windowOpened(WindowEvent e) {}
+		});
+		instance.setIconImage(getIcon());
+		instance.setSize(new Dimension(600,400));
+		instance.setLocationRelativeTo(null);
+		instance.setResizable(false);
+		instance.setTitle("TowerMiner");
+		launcherpanel = new LauncherPanel();
+		instance.add(launcherpanel);
+		instance.setVisible(true);
 	}
 
 	public static void launch(String arg) {
@@ -105,6 +114,10 @@ public class Launcher extends JFrame{
 		}
 		Data.save();
 		instance.dispose();
+		try {
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+		} catch (Exception e) {
+		}
 	}
 
 	public static File getDirectory() {
@@ -205,5 +218,15 @@ public class Launcher extends JFrame{
 			}
 		}
 	}
+	
+	public static Image getIcon() {
+        Image image = new ImageIcon(Launcher.class.getResource("/ressources/icon.png")).getImage();
+        return image;
+    }
+
+    public static Image getIBackground() {
+        Image image = new ImageIcon(Launcher.class.getResource("/ressources/background"+back+".png")).getImage();
+        return image;
+    }
 
 }
