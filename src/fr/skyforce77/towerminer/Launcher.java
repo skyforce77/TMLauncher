@@ -1,5 +1,6 @@
 package fr.skyforce77.towerminer;
 
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.WindowEvent;
@@ -36,6 +37,7 @@ public class Launcher extends JFrame{
 	public static void main(String[] args) {
 		Data.load();
 		
+		verifiyLauncherVersion();
 		back = new Random().nextInt(2);
 
 		try {
@@ -71,8 +73,8 @@ public class Launcher extends JFrame{
 		instance.setIconImage(getIcon());
 		instance.setSize(new Dimension(600,400));
 		instance.setLocationRelativeTo(null);
-		instance.setResizable(false);
-		instance.setTitle("TowerMiner");
+		instance.setMinimumSize(new Dimension(600,400));
+		instance.setTitle("TowerMiner - Launcher v"+version);
 		launcherpanel = new LauncherPanel();
 		instance.add(launcherpanel);
 		instance.setVisible(true);
@@ -194,6 +196,28 @@ public class Launcher extends JFrame{
 		}catch (Exception e){
 			return false;
 		}
+	}
+	
+	public static void verifiyLauncherVersion() {
+		try {
+			BufferedReader out = new BufferedReader(new InputStreamReader(new URL("http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/version.txt").openStream()));
+			if(Integer.parseInt(out.readLine()) != version) {
+				int i = JOptionPane.showConfirmDialog(null, "Voulez vous mettre à jour votre launcher?", "Mise à jour du launcher diponible", JOptionPane.YES_NO_OPTION);
+				if(i == JOptionPane.YES_OPTION) {
+					Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+					if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+						try {
+							desktop.browse(new URL(out.readLine()).toURI());
+							System.exit(1);
+						} catch (Exception ex) {
+							ex.printStackTrace();
+						}
+					}
+				} else if(i == JOptionPane.CLOSED_OPTION) {
+					System.exit(1);
+				}
+			}
+		}catch (Exception e){}
 	}
 
 	static class JTextFieldLimit extends PlainDocument{
