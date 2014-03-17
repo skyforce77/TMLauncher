@@ -9,17 +9,18 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
-import java.util.Random;
 
 import javax.swing.ProgressMonitor;
 
+import fr.skyforce77.towerminer.Launcher.updateThread;
+
 public class Download{
 
-	public static boolean update(String cause, String add) {
+	public static void update(String cause, String add, updateThread torun) {
 		int count;
 		boolean cancel = false;
 		ProgressMonitor monitor = new ProgressMonitor(Launcher.instance, cause, add, 0, 100);
-		File temp = new File(Launcher.getGame().toString().replace(".jar","-temp"+new Random().nextInt(99)+".jar"));
+		File temp = new File(Launcher.getGame().toString().replace(".jar","-temp.jar"));
 		try {
 			URL url = new URL(Launcher.downloadurl);
 			URLConnection conection = url.openConnection();
@@ -51,10 +52,11 @@ public class Download{
 
 		if(cancel) {
 			temp.delete();
-			return false;
+			torun.onUpdated(false);
 		} else {
 			move(temp,Launcher.getGame());
-			return true;
+			temp.delete();
+			torun.onUpdated(true);
 		}
 	}
 

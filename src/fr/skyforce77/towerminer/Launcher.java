@@ -27,7 +27,7 @@ public class Launcher extends JFrame{
 	private static final long serialVersionUID = -3444205831495972681L;
 	public static String versionurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
 	public static String downloadurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 8;
+	public static int version = 9;
 	public static Launcher instance;
 	public static String actual = "";
 	public static String actualdesc = "";
@@ -36,6 +36,8 @@ public class Launcher extends JFrame{
 
 	public static void main(String[] args) {
 		Data.load();
+		
+		getDirectory().mkdirs();
 		
 		verifiyLauncherVersion();
 		back = new Random().nextInt(2);
@@ -90,21 +92,42 @@ public class Launcher extends JFrame{
 			if(!version.equals(actual)) {
 				int update = JOptionPane.showConfirmDialog(null, "Voulez vous mettre à jour?\n"+actual+"\n"+actualdesc, "Mise à jour diponible", JOptionPane.YES_NO_OPTION);
 				if(update == JOptionPane.YES_OPTION) {
-					if(!Download.update("Mise à jour "+actual, actualdesc)) {
-						return;
-					}
-					setVersion(actual);
-					arg = "update";
+					new Thread() {
+						public void run() {
+							Download.update("Mise à jour "+actual, actualdesc, new updateThread(){
+								public void onUpdated(boolean success) {
+									if(success) {
+										setVersion(actual);
+										Launcher.launch("update");
+									} else {
+										JOptionPane.showMessageDialog(instance, "La mise à jour a échoué\nelle peut être causée par une mise à jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
+									}
+								};
+							});
+						};
+					}.start();
+					return;
 				}
 			}
 		} else {
 			getGame().getParentFile().mkdirs();
-			if(!Download.update("Téléchargement des fichiers...","")) {
-				return;
-			}
-			setVersion(actual);
-			arg = "install";
-			JOptionPane.showMessageDialog(instance, "Téléchargement du jeu effectué, vous devez maintenant relancer le jeu","Information",JOptionPane.INFORMATION_MESSAGE);
+			new Thread() {
+				public void run() {
+					Download.update("Téléchargement des fichiers...","", new updateThread(){
+						public void onUpdated(boolean success) {
+							if(success) {
+								setVersion(actual);
+								JOptionPane.showMessageDialog(instance, "Téléchargement du jeu effectué, vous devez maintenant relancer le jeu","Information",JOptionPane.INFORMATION_MESSAGE);
+								System.exit(1);
+							} else {
+								JOptionPane.showMessageDialog(instance, "Le téléchargement a échoué\nelle peut être causée par une mise à jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
+							}
+						};
+					});
+					return;
+				};
+			}.start();
+			return;
 		}
 		try {
 			if(!arg.equals("install")) {
@@ -252,5 +275,9 @@ public class Launcher extends JFrame{
         Image image = new ImageIcon(Launcher.class.getResource("/ressources/background"+back+".png")).getImage();
         return image;
     }
+    
+	public static class updateThread extends Thread {
+		public void onUpdated(boolean success) {}
+	}
 
 }

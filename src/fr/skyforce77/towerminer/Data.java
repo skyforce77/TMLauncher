@@ -26,6 +26,7 @@ public class Data implements Serializable{
 
     public static void load() {
         File f = new File(Launcher.getLauncherDirectory(),"database");
+        f.getParentFile().mkdirs();
         try {
             if(!f.exists()) {
                 f.createNewFile();
@@ -37,8 +38,6 @@ public class Data implements Serializable{
             data = (Data)in.readObject();
             fis.close();
             in.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) {}
     }
 }
