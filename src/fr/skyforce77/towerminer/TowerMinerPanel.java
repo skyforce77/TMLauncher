@@ -2,6 +2,7 @@ package fr.skyforce77.towerminer;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -16,8 +17,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
-public class LauncherPanel extends JPanel{
+public class TowerMinerPanel extends JPanel{
 
 	private static final long serialVersionUID = -8098337044846442718L;
 
@@ -25,10 +30,10 @@ public class LauncherPanel extends JPanel{
 	JTextField pseudo;
 	JButton play;
 	JButton close;
-	final LauncherPanel pn = this;
+	final TowerMinerPanel pn = this;
 
 	@SuppressWarnings("serial")
-	public LauncherPanel() {
+	public TowerMinerPanel() {
 		GroupLayout layout = new GroupLayout(this);
 		setLayout(layout);
 		setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
@@ -40,6 +45,19 @@ public class LauncherPanel extends JPanel{
 		JScrollPane scrollPane = new JScrollPane(textArea);
 		scrollPane.setBackground(new Color(255,255,255,130));
 		textArea.setEditable(false);
+		textArea.addHyperlinkListener(new HyperlinkListener() {
+	        public void hyperlinkUpdate(HyperlinkEvent e) {
+	            if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+		            if(Desktop.isDesktopSupported()) {
+		                try {
+		                    Desktop.getDesktop().browse(e.getURL().toURI());
+		                } catch (Exception e1) {
+		                    e1.printStackTrace();
+		                }
+		            }
+	            }
+	        }
+	    });
 		add(scrollPane);
 
 		try {
@@ -73,6 +91,16 @@ public class LauncherPanel extends JPanel{
 		pseudo.setPreferredSize(new Dimension(219, 40));
 		pseudo.setDocument(new Launcher.JTextFieldLimit(12));
 		pseudo.setText(Data.data.player);
+		pseudo.addCaretListener(new CaretListener() {
+			@Override
+			public void caretUpdate(CaretEvent arg0) {
+				if(pseudo.getText() != null && pseudo.getText().length() >= 5) {
+					play.setEnabled(true);
+				} else {
+					play.setEnabled(false);
+				}
+			}
+		});
 		add(pseudo);
 
 		play = new JButton("Jouer") {
@@ -93,6 +121,11 @@ public class LauncherPanel extends JPanel{
 				Launcher.launch("ok");
 			}
 		});
+		
+		if(Data.data.player == null || Data.data.player.length() < 5) {
+			play.setEnabled(false);
+		}
+		
 		play.setOpaque(false);
 		add(play);
 
@@ -113,19 +146,6 @@ public class LauncherPanel extends JPanel{
 				.addComponent(play, 500, 550, Integer.MAX_VALUE));
 		setVisible(true);
 		setEnabled(true);
-
-		new Thread() {
-			public void run() {
-				while(pn.isVisible()) {
-					try {
-						Thread.sleep(1l);
-						pn.repaint();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			};
-		}.start();
 	}
 
 	@Override

@@ -9,7 +9,7 @@ public class Data implements Serializable{
 
 	public static Data data = new Data();
 
-    public String player = "Missigno";
+    public String player = "";
     public UUID id = UUID.randomUUID();
 
     public static void save() {

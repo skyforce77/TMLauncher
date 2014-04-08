@@ -17,6 +17,7 @@ import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -26,12 +27,15 @@ public class Launcher extends JFrame{
 
 	private static final long serialVersionUID = -3444205831495972681L;
 	public static String versionurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
+	public static String pagesurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/pages.txt";
 	public static String downloadurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 9;
+	public static int version = 10;
 	public static Launcher instance;
 	public static String actual = "";
 	public static String actualdesc = "";
-	public static LauncherPanel launcherpanel;
+	public static JTabbedPane tabs;
+	public static TowerMinerPanel launcherpanel;
+	public static AboutPanel aboutpanel;
 	public static int back = 0;
 
 	public static void main(String[] args) {
@@ -76,10 +80,32 @@ public class Launcher extends JFrame{
 		instance.setSize(new Dimension(600,400));
 		instance.setLocationRelativeTo(null);
 		instance.setMinimumSize(new Dimension(600,400));
-		instance.setTitle("TowerMiner - Launcher v"+version);
-		launcherpanel = new LauncherPanel();
-		instance.add(launcherpanel);
+		instance.setTitle("Skyforce77 - Launcher v"+version);
+		
+		tabs = new JTabbedPane();
+		instance.add(tabs);
+		
+		launcherpanel = new TowerMinerPanel();
+		tabs.addTab("TowerMiner", getTowerMinerIcon(), launcherpanel);
+		
+		new Thread(){
+			public void run() {createPages();};
+		}.start();
+		
 		instance.setVisible(true);
+		
+		new Thread() {
+			public void run() {
+				while(instance.isVisible()) {
+					try {
+						Thread.sleep(1l);
+						instance.repaint();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			};
+		}.start();
 	}
 
 	public static void launch(String arg) {
@@ -208,6 +234,22 @@ public class Launcher extends JFrame{
 		}
 		return version;
 	}
+	
+	public static void createPages() {
+		try {
+			BufferedReader out = new BufferedReader(new InputStreamReader(new URL(pagesurl).openStream()));
+			String s = "";
+			while(s != null) {
+				s = out.readLine();
+				if(s != null && s != "") {
+					String name = s.split("=")[0];
+					aboutpanel = new AboutPanel(s.replace(name+"=",""));
+					tabs.addTab(name, getAboutIcon(), aboutpanel);
+				}
+			}
+			out.close();
+		}catch (Exception e){}
+	}
 
 	public static boolean getActualVersion() {
 		try {
@@ -224,8 +266,8 @@ public class Launcher extends JFrame{
 	public static void verifiyLauncherVersion() {
 		try {
 			BufferedReader out = new BufferedReader(new InputStreamReader(new URL("http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/version.txt").openStream()));
-			if(Integer.parseInt(out.readLine()) != version) {
-				int i = JOptionPane.showConfirmDialog(null, "Voulez vous mettre à jour votre launcher?", "Mise à jour du launcher diponible", JOptionPane.YES_NO_OPTION);
+			if(Integer.parseInt(out.readLine()) > version) {
+				int i = JOptionPane.showConfirmDialog(null, "Voulez vous mettre a jour votre launcher?", "Mise a� jour du launcher diponible", JOptionPane.YES_NO_OPTION);
 				if(i == JOptionPane.YES_OPTION) {
 					Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
 					if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
@@ -267,8 +309,16 @@ public class Launcher extends JFrame{
 	}
 	
 	public static Image getIcon() {
-        Image image = new ImageIcon(Launcher.class.getResource("/ressources/icon.png")).getImage();
+        Image image = new ImageIcon(Launcher.class.getResource("/ressources/avatardaft.png")).getImage();
         return image;
+    }
+	
+	public static ImageIcon getTowerMinerIcon() {
+        return new ImageIcon(Launcher.class.getResource("/ressources/icon.png"));
+    }
+	
+	public static ImageIcon getAboutIcon() {
+        return new ImageIcon(Launcher.class.getResource("/ressources/paper.png"));
     }
 
     public static Image getIBackground() {
