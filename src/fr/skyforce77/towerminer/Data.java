@@ -3,6 +3,8 @@ package fr.skyforce77.towerminer;
 import java.io.*;
 import java.util.UUID;
 
+import javax.crypto.SealedObject;
+
 public class Data implements Serializable{
 
 	private static final long serialVersionUID = 7411024786937542168L;
@@ -11,6 +13,8 @@ public class Data implements Serializable{
 
     public String player = "";
     public UUID id = UUID.randomUUID();
+    public SealedObject passtable;
+    public byte[] publick;
 
     public static void save() {
         try {

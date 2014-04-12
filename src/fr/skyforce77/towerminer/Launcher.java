@@ -3,6 +3,9 @@ package fr.skyforce77.towerminer;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.Transferable;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedReader;
@@ -11,6 +14,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Random;
 
@@ -23,7 +27,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
 
-public class Launcher extends JFrame{
+public class Launcher extends JFrame implements ClipboardOwner{
 
 	private static final long serialVersionUID = -3444205831495972681L;
 	public static String versionurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
@@ -77,16 +81,19 @@ public class Launcher extends JFrame{
 			public void windowOpened(WindowEvent e) {}
 		});
 		instance.setIconImage(getIcon());
-		instance.setSize(new Dimension(600,400));
+		instance.setSize(new Dimension(700,500));
 		instance.setLocationRelativeTo(null);
-		instance.setMinimumSize(new Dimension(600,400));
-		instance.setTitle("Skyforce77 - Launcher v"+version);
+		instance.setMinimumSize(instance.getSize());
+		instance.setTitle("Skyforce77's launcher (v"+version+")");
 		
 		tabs = new JTabbedPane();
+		
 		instance.add(tabs);
 		
 		launcherpanel = new TowerMinerPanel();
 		tabs.addTab("TowerMiner", getTowerMinerIcon(), launcherpanel);
+		tabs.addTab("PassSaver", getIcon("lock"), new PassSaverPanel());
+		tabs.addTab("HtmlEdit", getIcon("enchant"), new HTMLEditPanel());
 		
 		new Thread(){
 			public void run() {createPages();};
@@ -100,9 +107,7 @@ public class Launcher extends JFrame{
 					try {
 						Thread.sleep(1l);
 						instance.repaint();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+					} catch (InterruptedException e) {}
 				}
 			};
 		}.start();
@@ -116,17 +121,17 @@ public class Launcher extends JFrame{
 			getGame().getParentFile().mkdirs();
 			String version = getVersion();
 			if(!version.equals(actual)) {
-				int update = JOptionPane.showConfirmDialog(null, "Voulez vous mettre à jour?\n"+actual+"\n"+actualdesc, "Mise à jour diponible", JOptionPane.YES_NO_OPTION);
+				int update = JOptionPane.showConfirmDialog(null, "Voulez vous mettre a jour?\n"+actual+"\n"+actualdesc, "Mise a jour diponible", JOptionPane.YES_NO_OPTION);
 				if(update == JOptionPane.YES_OPTION) {
 					new Thread() {
 						public void run() {
-							Download.update("Mise à jour "+actual, actualdesc, new updateThread(){
+							Download.update("Mise a jour "+actual, actualdesc, new updateThread(){
 								public void onUpdated(boolean success) {
 									if(success) {
 										setVersion(actual);
 										Launcher.launch("update");
 									} else {
-										JOptionPane.showMessageDialog(instance, "La mise à jour a échoué\nelle peut être causée par une mise à jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
+										JOptionPane.showMessageDialog(instance, "La mise a� jour a echoue\ncela peut etre cause par une mise a jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
 									}
 								};
 							});
@@ -139,14 +144,14 @@ public class Launcher extends JFrame{
 			getGame().getParentFile().mkdirs();
 			new Thread() {
 				public void run() {
-					Download.update("Téléchargement des fichiers...","", new updateThread(){
+					Download.update("Telechargement des fichiers...","", new updateThread(){
 						public void onUpdated(boolean success) {
 							if(success) {
 								setVersion(actual);
-								JOptionPane.showMessageDialog(instance, "Téléchargement du jeu effectué, vous devez maintenant relancer le jeu","Information",JOptionPane.INFORMATION_MESSAGE);
+								JOptionPane.showMessageDialog(instance, "Telechargement du jeu effectue, vous devez maintenant relancer le jeu","Information",JOptionPane.INFORMATION_MESSAGE);
 								System.exit(1);
 							} else {
-								JOptionPane.showMessageDialog(instance, "Le téléchargement a échoué\nelle peut être causée par une mise à jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(instance, "Le telechargement a echoue\ncela peut etre causee par une mise a jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
 							}
 						};
 					});
@@ -161,7 +166,7 @@ public class Launcher extends JFrame{
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(instance, "Une erreur est survenue,\nelle peut être causée par une mise à jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(instance, "Une erreur est survenue,\nelle peut etre causee par une mise a jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
 		}
 		Data.save();
 		instance.dispose();
@@ -241,10 +246,18 @@ public class Launcher extends JFrame{
 			String s = "";
 			while(s != null) {
 				s = out.readLine();
-				if(s != null && s != "") {
-					String name = s.split("=")[0];
-					aboutpanel = new AboutPanel(s.replace(name+"=",""));
+				if(s != null && s != "" && !s.startsWith("//") && s.startsWith("p")) {
+					String balise = s.split("=")[0];
+					String name = s.split("=")[1];
+					aboutpanel = new AboutPanel(s.replace(balise+"="+name+"=",""));
 					tabs.addTab(name, getAboutIcon(), aboutpanel);
+				} else if(s != null && s != "" && s.startsWith("i")) {
+					String balise = s.split("=")[0];
+					int i = tabs.getTabCount()-1;
+					try {
+						Integer.parseInt(balise.replace("i",""));
+					} catch(Exception e) {}
+					tabs.setIconAt(i, getDistantIcon(s.replace(balise+"=", "")));
 				}
 			}
 			out.close();
@@ -317,8 +330,20 @@ public class Launcher extends JFrame{
         return new ImageIcon(Launcher.class.getResource("/ressources/icon.png"));
     }
 	
+	public static ImageIcon getDistantIcon(String url) {
+        try {
+			return new ImageIcon(new URL(url));
+		} catch (MalformedURLException e) {
+			return null;
+		}
+    }
+	
 	public static ImageIcon getAboutIcon() {
         return new ImageIcon(Launcher.class.getResource("/ressources/paper.png"));
+    }
+	
+	public static ImageIcon getIcon(String name) {
+        return new ImageIcon(Launcher.class.getResource("/ressources/"+name+".png"));
     }
 
     public static Image getIBackground() {
@@ -329,5 +354,8 @@ public class Launcher extends JFrame{
 	public static class updateThread extends Thread {
 		public void onUpdated(boolean success) {}
 	}
+
+	@Override
+	public void lostOwnership(Clipboard arg0, Transferable arg1) {}
 
 }
