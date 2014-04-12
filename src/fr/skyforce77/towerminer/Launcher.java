@@ -1,5 +1,6 @@
 package fr.skyforce77.towerminer;
 
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Image;
@@ -33,7 +34,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 	public static String versionurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
 	public static String pagesurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/pages.txt";
 	public static String downloadurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 10;
+	public static int version = 11;
 	public static Launcher instance;
 	public static String actual = "";
 	public static String actualdesc = "";
@@ -246,18 +247,66 @@ public class Launcher extends JFrame implements ClipboardOwner{
 			String s = "";
 			while(s != null) {
 				s = out.readLine();
-				if(s != null && s != "" && !s.startsWith("//") && s.startsWith("p")) {
+				if(s != null && s != "" && !s.startsWith("//") && s.startsWith("page")) {
 					String balise = s.split("=")[0];
 					String name = s.split("=")[1];
 					aboutpanel = new AboutPanel(s.replace(balise+"="+name+"=",""));
 					tabs.addTab(name, getAboutIcon(), aboutpanel);
-				} else if(s != null && s != "" && s.startsWith("i")) {
+				} else if(s != null && s != "" && s.startsWith("icon")) {
 					String balise = s.split("=")[0];
 					int i = tabs.getTabCount()-1;
 					try {
-						Integer.parseInt(balise.replace("i",""));
+						i = Integer.parseInt(balise.replace("icon",""));
 					} catch(Exception e) {}
 					tabs.setIconAt(i, getDistantIcon(s.replace(balise+"=", "")));
+				} else if(s != null && s != "" && s.startsWith("name")) {
+					String balise = s.split("=")[0];
+					int i = tabs.getTabCount()-1;
+					try {
+						i = Integer.parseInt(balise.replace("name",""));
+					} catch(Exception e) {}
+					tabs.setTitleAt(i, s.replace(balise+"=", ""));
+				} else if(s != null && s != "" && s.startsWith("tooltip")) {
+					String balise = s.split("=")[0];
+					int i = tabs.getTabCount()-1;
+					try {
+						i = Integer.parseInt(balise.replace("tooltip",""));
+					} catch(Exception e) {}
+					tabs.setToolTipTextAt(i, s.replace(balise+"=", ""));
+				} else if(s != null && s != "" && s.startsWith("foreground")) {
+					String balise = s.split("=")[0];
+					int i = tabs.getTabCount()-1;
+					try {
+						i = Integer.parseInt(balise.replace("foreground",""));
+					} catch(Exception e) {}
+					tabs.setForegroundAt(i, new Color(Integer.parseInt(s.replace(balise+"=", ""))));
+				} else if(s != null && s != "" && s.startsWith("background")) {
+					String balise = s.split("=")[0];
+					int i = tabs.getTabCount()-1;
+					try {
+						i = Integer.parseInt(balise.replace("background",""));
+					} catch(Exception e) {}
+					tabs.setBackgroundAt(i, new Color(Integer.parseInt(s.replace(balise+"=", ""))));
+				} else if(s != null && s != "" && s.startsWith("disable")) {
+					String balise = s.split("=")[0];
+					int i = tabs.getTabCount()-1;
+					try {
+						i = Integer.parseInt(balise.replace("disable",""));
+					} catch(Exception e) {}
+					tabs.setEnabledAt(i, !Boolean.parseBoolean(s.replace(balise+"=", "")));
+				} else if(s != null && s != "" && s.startsWith("memo")) {
+					String balise = s.split("=")[0];
+					int i = tabs.getTabCount()-1;
+					try {
+						i = Integer.parseInt(balise.replace("memo",""));
+					} catch(Exception e) {}
+					tabs.setMnemonicAt(i, s.replace(balise+"=", "").charAt(0));
+				} else if(s != null && s != "" && s.startsWith("select")) {
+					int i = tabs.getTabCount()-1;
+					try {
+						i = Integer.parseInt(s.replace("select",""));
+					} catch(Exception e) {}
+					tabs.setSelectedIndex(i);
 				}
 			}
 			out.close();
