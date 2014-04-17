@@ -14,7 +14,7 @@ public class Launch {
 		addURLToSystemClassLoader(Launcher.getGame().toURI().toURL());
 		Class<?> cls = ClassLoader.getSystemClassLoader().loadClass("fr.skyforce77.towerminer.TowerMiner");
 		if(!launch_A_07(arg, cls) && !launch_A_08(arg, cls) && !launch_B_03(arg, cls)) {
-			JOptionPane.showMessageDialog(null, "Une erreur est survenue,\nelle peut être causée par une mise à jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Une erreur est survenue,\nelle peut Etre causee par une mise a jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
 		}
 	}
 
@@ -48,7 +48,7 @@ public class Launch {
 		return true;
 	}
 	
-	public static void addURLToSystemClassLoader(URL url) throws IntrospectionException { 
+	public static boolean addURLToSystemClassLoader(URL url) throws IntrospectionException { 
 		URLClassLoader systemClassLoader = (URLClassLoader) ClassLoader.getSystemClassLoader(); 
 		Class<URLClassLoader> classLoaderClass = URLClassLoader.class; 
 		try { 
@@ -56,9 +56,10 @@ public class Launch {
 			method.setAccessible(true); 
 			method.invoke(systemClassLoader, new Object[]{url}); 
 		} catch (Throwable t) { 
-			t.printStackTrace(); 
-			throw new IntrospectionException("Error when adding url to system ClassLoader "); 
-		} 
+			t.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 	
 }

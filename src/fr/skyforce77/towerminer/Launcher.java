@@ -17,6 +17,7 @@ import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.ImageIcon;
@@ -34,7 +35,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 	public static String versionurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
 	public static String pagesurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/pages.txt";
 	public static String downloadurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 11;
+	public static int version = 12;
 	public static Launcher instance;
 	public static String actual = "";
 	public static String actualdesc = "";
@@ -45,9 +46,9 @@ public class Launcher extends JFrame implements ClipboardOwner{
 
 	public static void main(String[] args) {
 		Data.load();
-		
+
 		getDirectory().mkdirs();
-		
+
 		verifiyLauncherVersion();
 		back = new Random().nextInt(2);
 
@@ -86,22 +87,22 @@ public class Launcher extends JFrame implements ClipboardOwner{
 		instance.setLocationRelativeTo(null);
 		instance.setMinimumSize(instance.getSize());
 		instance.setTitle("Skyforce77's launcher (v"+version+")");
-		
+
 		tabs = new JTabbedPane();
-		
+
 		instance.add(tabs);
-		
+
 		launcherpanel = new TowerMinerPanel();
 		tabs.addTab("TowerMiner", getTowerMinerIcon(), launcherpanel);
 		tabs.addTab("PassSaver", getIcon("lock"), new PassSaverPanel());
 		tabs.addTab("HtmlEdit", getIcon("enchant"), new HTMLEditPanel());
-		
+
 		new Thread(){
 			public void run() {createPages();};
 		}.start();
-		
+
 		instance.setVisible(true);
-		
+
 		new Thread() {
 			public void run() {
 				while(instance.isVisible()) {
@@ -240,76 +241,86 @@ public class Launcher extends JFrame implements ClipboardOwner{
 		}
 		return version;
 	}
-	
+
 	public static void createPages() {
+		ArrayList<String> icons = new ArrayList<String>();
+		ArrayList<Integer> id = new ArrayList<Integer>();
 		try {
-			BufferedReader out = new BufferedReader(new InputStreamReader(new URL(pagesurl).openStream()));
-			String s = "";
-			while(s != null) {
-				s = out.readLine();
-				if(s != null && s != "" && !s.startsWith("//") && s.startsWith("page")) {
-					String balise = s.split("=")[0];
-					String name = s.split("=")[1];
-					aboutpanel = new AboutPanel(s.replace(balise+"="+name+"=",""));
-					tabs.addTab(name, getAboutIcon(), aboutpanel);
-				} else if(s != null && s != "" && s.startsWith("icon")) {
-					String balise = s.split("=")[0];
-					int i = tabs.getTabCount()-1;
-					try {
-						i = Integer.parseInt(balise.replace("icon",""));
-					} catch(Exception e) {}
-					tabs.setIconAt(i, getDistantIcon(s.replace(balise+"=", "")));
-				} else if(s != null && s != "" && s.startsWith("name")) {
-					String balise = s.split("=")[0];
-					int i = tabs.getTabCount()-1;
-					try {
-						i = Integer.parseInt(balise.replace("name",""));
-					} catch(Exception e) {}
-					tabs.setTitleAt(i, s.replace(balise+"=", ""));
-				} else if(s != null && s != "" && s.startsWith("tooltip")) {
-					String balise = s.split("=")[0];
-					int i = tabs.getTabCount()-1;
-					try {
-						i = Integer.parseInt(balise.replace("tooltip",""));
-					} catch(Exception e) {}
-					tabs.setToolTipTextAt(i, s.replace(balise+"=", ""));
-				} else if(s != null && s != "" && s.startsWith("foreground")) {
-					String balise = s.split("=")[0];
-					int i = tabs.getTabCount()-1;
-					try {
-						i = Integer.parseInt(balise.replace("foreground",""));
-					} catch(Exception e) {}
-					tabs.setForegroundAt(i, new Color(Integer.parseInt(s.replace(balise+"=", ""))));
-				} else if(s != null && s != "" && s.startsWith("background")) {
-					String balise = s.split("=")[0];
-					int i = tabs.getTabCount()-1;
-					try {
-						i = Integer.parseInt(balise.replace("background",""));
-					} catch(Exception e) {}
-					tabs.setBackgroundAt(i, new Color(Integer.parseInt(s.replace(balise+"=", ""))));
-				} else if(s != null && s != "" && s.startsWith("disable")) {
-					String balise = s.split("=")[0];
-					int i = tabs.getTabCount()-1;
-					try {
-						i = Integer.parseInt(balise.replace("disable",""));
-					} catch(Exception e) {}
-					tabs.setEnabledAt(i, !Boolean.parseBoolean(s.replace(balise+"=", "")));
-				} else if(s != null && s != "" && s.startsWith("memo")) {
-					String balise = s.split("=")[0];
-					int i = tabs.getTabCount()-1;
-					try {
-						i = Integer.parseInt(balise.replace("memo",""));
-					} catch(Exception e) {}
-					tabs.setMnemonicAt(i, s.replace(balise+"=", "").charAt(0));
-				} else if(s != null && s != "" && s.startsWith("select")) {
-					int i = tabs.getTabCount()-1;
-					try {
-						i = Integer.parseInt(s.replace("select",""));
-					} catch(Exception e) {}
-					tabs.setSelectedIndex(i);
-				}
+			final BufferedReader out = new BufferedReader(new InputStreamReader(new URL(pagesurl).openStream()));
+			String line = "";
+			while((line = out.readLine()) != null) {
+				String s = line;
+				try {
+					if(s != null && s != "" && !s.startsWith("//") && s.startsWith("page")) {
+						String balise = s.split("=")[0];
+						String name = s.split("=")[1];
+						aboutpanel = new AboutPanel(s.replace(balise+"="+name+"=",""));
+						tabs.addTab(name, getAboutIcon(), aboutpanel);
+					} else if(s != null && s != "" && s.startsWith("icon")) {
+						String balise = s.split("=")[0];
+						int i = tabs.getTabCount()-1;
+						try {
+							i = Integer.parseInt(balise.replace("icon",""));
+						} catch(Exception e) {}
+						id.add(i);
+						icons.add(s.replace(balise+"=", ""));
+					} else if(s != null && s != "" && s.startsWith("name")) {
+						String balise = s.split("=")[0];
+						int i = tabs.getTabCount()-1;
+						try {
+							i = Integer.parseInt(balise.replace("name",""));
+						} catch(Exception e) {}
+						tabs.setTitleAt(i, s.replace(balise+"=", ""));
+					} else if(s != null && s != "" && s.startsWith("tooltip")) {
+						String balise = s.split("=")[0];
+						int i = tabs.getTabCount()-1;
+						try {
+							i = Integer.parseInt(balise.replace("tooltip",""));
+						} catch(Exception e) {}
+						tabs.setToolTipTextAt(i, s.replace(balise+"=", ""));
+					} else if(s != null && s != "" && s.startsWith("foreground")) {
+						String balise = s.split("=")[0];
+						int i = tabs.getTabCount()-1;
+						try {
+							i = Integer.parseInt(balise.replace("foreground",""));
+						} catch(Exception e) {}
+						tabs.setForegroundAt(i, new Color(Integer.parseInt(s.replace(balise+"=", ""))));
+					} else if(s != null && s != "" && s.startsWith("background")) {
+						String balise = s.split("=")[0];
+						int i = tabs.getTabCount()-1;
+						try {
+							i = Integer.parseInt(balise.replace("background",""));
+						} catch(Exception e) {}
+						tabs.setBackgroundAt(i, new Color(Integer.parseInt(s.replace(balise+"=", ""))));
+					} else if(s != null && s != "" && s.startsWith("disable")) {
+						String balise = s.split("=")[0];
+						int i = tabs.getTabCount()-1;
+						try {
+							i = Integer.parseInt(balise.replace("disable",""));
+						} catch(Exception e) {}
+						tabs.setEnabledAt(i, !Boolean.parseBoolean(s.replace(balise+"=", "")));
+					} else if(s != null && s != "" && s.startsWith("memo")) {
+						String balise = s.split("=")[0];
+						int i = tabs.getTabCount()-1;
+						try {
+							i = Integer.parseInt(balise.replace("memo",""));
+						} catch(Exception e) {}
+						tabs.setMnemonicAt(i, s.replace(balise+"=", "").charAt(0));
+					} else if(s != null && s != "" && s.startsWith("select")) {
+						int i = tabs.getTabCount()-1;
+						try {
+							i = Integer.parseInt(s.replace("select",""));
+						} catch(Exception e) {}
+						tabs.setSelectedIndex(i);
+					}
+				} catch(Exception e) {}
 			}
 			out.close();
+			int n = 0;
+			while(n < icons.size()) {
+				tabs.setIconAt(id.get(n), getDistantIcon(icons.get(n)));
+				n++;
+			}
 		}catch (Exception e){}
 	}
 
@@ -324,7 +335,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 			return false;
 		}
 	}
-	
+
 	public static void verifiyLauncherVersion() {
 		try {
 			BufferedReader out = new BufferedReader(new InputStreamReader(new URL("http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/version.txt").openStream()));
@@ -369,37 +380,37 @@ public class Launcher extends JFrame implements ClipboardOwner{
 			}
 		}
 	}
-	
+
 	public static Image getIcon() {
-        Image image = new ImageIcon(Launcher.class.getResource("/ressources/avatardaft.png")).getImage();
-        return image;
-    }
-	
+		Image image = new ImageIcon(Launcher.class.getResource("/ressources/avatardaft.png")).getImage();
+		return image;
+	}
+
 	public static ImageIcon getTowerMinerIcon() {
-        return new ImageIcon(Launcher.class.getResource("/ressources/icon.png"));
-    }
-	
+		return new ImageIcon(Launcher.class.getResource("/ressources/icon.png"));
+	}
+
 	public static ImageIcon getDistantIcon(String url) {
-        try {
+		try {
 			return new ImageIcon(new URL(url));
 		} catch (MalformedURLException e) {
 			return null;
 		}
-    }
-	
-	public static ImageIcon getAboutIcon() {
-        return new ImageIcon(Launcher.class.getResource("/ressources/paper.png"));
-    }
-	
-	public static ImageIcon getIcon(String name) {
-        return new ImageIcon(Launcher.class.getResource("/ressources/"+name+".png"));
-    }
+	}
 
-    public static Image getIBackground() {
-        Image image = new ImageIcon(Launcher.class.getResource("/ressources/background"+back+".png")).getImage();
-        return image;
-    }
-    
+	public static ImageIcon getAboutIcon() {
+		return new ImageIcon(Launcher.class.getResource("/ressources/paper.png"));
+	}
+
+	public static ImageIcon getIcon(String name) {
+		return new ImageIcon(Launcher.class.getResource("/ressources/"+name+".png"));
+	}
+
+	public static Image getIBackground() {
+		Image image = new ImageIcon(Launcher.class.getResource("/ressources/background"+back+".png")).getImage();
+		return image;
+	}
+
 	public static class updateThread extends Thread {
 		public void onUpdated(boolean success) {}
 	}

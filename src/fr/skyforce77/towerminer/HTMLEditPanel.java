@@ -10,6 +10,7 @@ import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 
 public class HTMLEditPanel extends JPanel{
@@ -51,7 +52,7 @@ public class HTMLEditPanel extends JPanel{
 			}
 		});
 		
-		JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, html, text);
+		JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(html), new JScrollPane(text));
 		split.setDividerLocation(200);
 		add(split);
 		
