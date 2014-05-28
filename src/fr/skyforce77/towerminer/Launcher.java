@@ -35,7 +35,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 	public static String versionurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
 	public static String pagesurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/pages.txt";
 	public static String downloadurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 12;
+	public static int version = 13;
 	public static Launcher instance;
 	public static String actual = "";
 	public static String actualdesc = "";
@@ -94,7 +94,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 
 		launcherpanel = new TowerMinerPanel();
 		tabs.addTab("TowerMiner", getTowerMinerIcon(), launcherpanel);
-		tabs.addTab("PassSaver", getIcon("lock"), new PassSaverPanel());
+		tabs.addTab("PluginInstaller", getIcon("lock"), new PluginInstallerPanel());
 		tabs.addTab("HtmlEdit", getIcon("enchant"), new HTMLEditPanel());
 
 		new Thread(){
@@ -238,6 +238,9 @@ public class Launcher extends JFrame implements ClipboardOwner{
 			out.close();
 		}catch (Exception e){
 			e.printStackTrace();
+		}
+		if(version == null) {
+			version = "";
 		}
 		return version;
 	}

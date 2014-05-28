@@ -59,11 +59,54 @@ public class Download{
 			torun.onUpdated(true);
 		}
 	}
+	
+	public static void downloadPlugin(String plugin, String version, String urlf) {
+		int count;
+		boolean cancel = false;
+		ProgressMonitor monitor = new ProgressMonitor(Launcher.instance, "Téléchargement du plugin", plugin, 0, 100);
+		File temp = new File(Launcher.getDirectory(),"/temp/"+plugin+" v"+version+".jar");
+		try {
+			URL url = new URL(urlf);
+			URLConnection conection = url.openConnection();
+			conection.connect();
+			int lenghtOfFile = conection.getContentLength();
+			InputStream input = new BufferedInputStream(url.openStream(), 8192);
+			OutputStream output = new FileOutputStream(temp);
+
+			byte data[] = new byte[1024];
+
+			long total = 0;
+
+			while ((count = input.read(data)) != -1 && !cancel) {
+				total += count;
+				monitor.setProgress((int)((total*100)/lenghtOfFile));
+				output.write(data, 0, count);
+				cancel = monitor.isCanceled();
+			}
+
+			output.flush();
+			output.close();
+			input.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		monitor.close();
+
+		if(cancel) {
+			temp.delete();
+		} else {
+			move(temp,new File(Launcher.getDirectory(),"/plugins/"+plugin+" v"+version+".jar"));
+			temp.delete();
+		}
+	}
 
 	@SuppressWarnings("resource")
 	public static void move(File source, File destination) {
 		try {
 			if(!destination.exists()) {
+				System.out.println(destination.getPath());
 				destination.createNewFile();
 			}
 

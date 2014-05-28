@@ -1,6 +1,7 @@
 package fr.skyforce77.towerminer;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.UUID;
 
 import javax.crypto.SealedObject;
@@ -15,6 +16,7 @@ public class Data implements Serializable{
     public UUID id = UUID.randomUUID();
     public SealedObject passtable;
     public byte[] publick;
+    public HashMap<String, Object> storage = new HashMap<String, Object>();
 
     public static void save() {
         try {
