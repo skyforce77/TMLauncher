@@ -2,6 +2,7 @@ package fr.skyforce77.towerminer;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.UUID;
 
 import javax.crypto.SealedObject;
@@ -12,7 +13,7 @@ public class Data implements Serializable{
 
 	public static Data data = new Data();
 
-    public String player = "";
+    public String player = "Player"+new Random().nextInt(99999);
     public UUID id = UUID.randomUUID();
     public SealedObject passtable;
     public byte[] publick;

@@ -4,14 +4,18 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
 import javax.swing.table.AbstractTableModel;
 
 public class EditableJTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = -8145900105256258979L;
 
 	private ArrayList<Info> infos = new ArrayList<Info>();
+	public static String INSTALLED = "Installe";
+	public static String UPDATE = "Mise a jour disponible";
+	public static String DOWNLOAD = "Disponible";
 	 
-    private final String[] columns = {"Plugin","Version","Status"};
+    private final String[] columns = {"Plugin","Version","Statut"};
  
     public EditableJTableModel() {
         super();
@@ -60,9 +64,33 @@ public class EditableJTableModel extends AbstractTableModel {
     		}
     	}
     	if(exists) {
-    		return update ? "Mise à jour disponible" : "Installé et à jour";
+    		if(update && !PluginInstallerPanel.notified.contains(i.plugin)) {
+    			PluginInstallerPanel.notified.add(i.plugin);
+    			JOptionPane.showMessageDialog(null, "Mise a jour disponible\nPlugin: "+i.plugin+"\nVersion: "+i.version,"Information",JOptionPane.INFORMATION_MESSAGE);
+    			Launcher.tabs.setSelectedIndex(1);
+    		}
+    		return update ? UPDATE : INSTALLED;
     	} else {
-    		return "Téléchargeable";
+    		return DOWNLOAD;
+    	}
+    }
+    
+    public int getIntStatus(Info i) {
+    	File d = new File(Launcher.getDirectory(), "/plugins");
+    	boolean exists = false;
+    	boolean update = true;
+    	for(File f : d.listFiles()) {
+    		if(f.getName().contains(i.plugin)) {
+    			exists = true;
+    			if(f.getName().contains(i.version)) {
+    				update = false;
+    			}
+    		}
+    	}
+    	if(exists) {
+    		return update ? 2 : 1;
+    	} else {
+    		return 0;
     	}
     }
  

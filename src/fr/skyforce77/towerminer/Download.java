@@ -63,7 +63,7 @@ public class Download{
 	public static void downloadPlugin(String plugin, String version, String urlf) {
 		int count;
 		boolean cancel = false;
-		ProgressMonitor monitor = new ProgressMonitor(Launcher.instance, "Téléchargement du plugin", plugin, 0, 100);
+		ProgressMonitor monitor = new ProgressMonitor(Launcher.instance, "Telechargement du plugin", plugin, 0, 100);
 		File temp = new File(Launcher.getDirectory(),"/temp/"+plugin+" v"+version+".jar");
 		try {
 			URL url = new URL(urlf);
@@ -106,7 +106,6 @@ public class Download{
 	public static void move(File source, File destination) {
 		try {
 			if(!destination.exists()) {
-				System.out.println(destination.getPath());
 				destination.createNewFile();
 			}
 

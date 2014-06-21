@@ -35,7 +35,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 	public static String versionurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
 	public static String pagesurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/pages.txt";
 	public static String downloadurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 13;
+	public static int version = 15;
 	public static Launcher instance;
 	public static String actual = "";
 	public static String actualdesc = "";
@@ -96,12 +96,22 @@ public class Launcher extends JFrame implements ClipboardOwner{
 		tabs.addTab("TowerMiner", getTowerMinerIcon(), launcherpanel);
 		tabs.addTab("PluginInstaller", getIcon("lock"), new PluginInstallerPanel());
 		tabs.addTab("HtmlEdit", getIcon("enchant"), new HTMLEditPanel());
+		
+		instance.setVisible(true);
 
 		new Thread(){
-			public void run() {createPages();};
+			public void run() {
+				createPages();
+				int i = tabs.getSelectedIndex();
+				tabs.setSelectedIndex(1);
+				try {
+					Thread.sleep(1l);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				tabs.setSelectedIndex(i);
+			};
 		}.start();
-
-		instance.setVisible(true);
 
 		new Thread() {
 			public void run() {
@@ -133,7 +143,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 										setVersion(actual);
 										Launcher.launch("update");
 									} else {
-										JOptionPane.showMessageDialog(instance, "La mise a  jour a echoue\ncela peut etre cause par une mise a jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
+										JOptionPane.showMessageDialog(instance, "La mise a jour a echoue\ncela peut etre cause par une mise a jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
 									}
 								};
 							});
@@ -343,7 +353,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 		try {
 			BufferedReader out = new BufferedReader(new InputStreamReader(new URL("http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/version.txt").openStream()));
 			if(Integer.parseInt(out.readLine()) > version) {
-				int i = JOptionPane.showConfirmDialog(null, "Voulez vous mettre a jour votre launcher?", "Mise a  jour du launcher diponible", JOptionPane.YES_NO_OPTION);
+				int i = JOptionPane.showConfirmDialog(null, "Voulez vous mettre a jour votre launcher?", "Mise a jour du launcher diponible", JOptionPane.YES_NO_OPTION);
 				if(i == JOptionPane.YES_OPTION) {
 					Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
 					if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {

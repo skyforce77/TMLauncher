@@ -30,6 +30,7 @@ public class PluginInstallerPanel extends JPanel{
 
 	JTable table;
 	final PluginInstallerPanel pn = this;
+	public static ArrayList<String> notified = new ArrayList<String>();
 
 	public PluginInstallerPanel() {
 		GroupLayout layout = new GroupLayout(this);
@@ -38,7 +39,7 @@ public class PluginInstallerPanel extends JPanel{
 		setSize(new Dimension(600,400));
 		setBackground(new Color(255,255,255,125));
 			try {
-				ArrayList<Info> i = new ArrayList<EditableJTableModel.Info>();
+				ArrayList<Info> i = new ArrayList<Info>();
 				try {
 					final BufferedReader out = new BufferedReader(new InputStreamReader(new URL("http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/plugins.txt").openStream()));
 					String line = "";
@@ -76,6 +77,9 @@ public class PluginInstallerPanel extends JPanel{
 				}
 			}
 		});
+		table.setDefaultRenderer(Object.class, new UpdateCellRender());
+		table.getTableHeader().setReorderingAllowed(false);
+		table.getTableHeader().setResizingAllowed(false);
 		JScrollPane scrollPane = new JScrollPane(table);
 		add(scrollPane);
 
@@ -112,6 +116,28 @@ public class PluginInstallerPanel extends JPanel{
 					}.start();
 				}
 			});
+			JMenuItem update = new JMenuItem("Mettre a jour", Launcher.getIcon("key"));
+			update.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					for(int s : table.getSelectedRows()) {
+						File d = new File(Launcher.getDirectory(), "/plugins");
+						for(File f : d.listFiles()) {
+				    		if(f.getName().contains(((EditableJTableModel)table.getModel()).getInfos().get(s).plugin)) {
+				    			f.delete();
+				    		}
+				    	}
+					}
+					
+					int s = table.getSelectedRow();
+					final Info i = ((EditableJTableModel)table.getModel()).getInfos().get(s);
+					new Thread() {
+						public void run() {
+							Download.downloadPlugin(i.plugin, i.version, i.url);
+						};
+					}.start();
+				}
+			});
 			JMenuItem delete = new JMenuItem("Supprimer", Launcher.getIcon("delete"));
 			delete.addActionListener(new ActionListener() {
 				@Override
@@ -131,7 +157,14 @@ public class PluginInstallerPanel extends JPanel{
 			});
 			
 			if(!table.getSelectionModel().isSelectionEmpty() && table.getSelectionModel().getMaxSelectionIndex() == table.getSelectionModel().getMinSelectionIndex()) {
-				add(read);
+				int s = table.getSelectedRow();
+				final Info i = ((EditableJTableModel)table.getModel()).getInfos().get(s);
+				int st = ((EditableJTableModel)table.getModel()).getIntStatus(i);
+				if(st == 0) {
+					add(read);
+				} else if(st == 2) {
+					add(update);
+				}
 			}
 			add(delete);
 		}
