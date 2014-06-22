@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.text.html.HTMLEditorKit;
 
 public class AboutPanel extends JPanel{
 
@@ -31,6 +32,9 @@ public class AboutPanel extends JPanel{
 		JScrollPane scrollPane = new JScrollPane(textArea);
 		scrollPane.setBackground(new Color(255,255,255,130));
 		textArea.setEditable(false);
+		HTMLEditorKit kit=new HTMLEditorKit();
+		kit.setAutoFormSubmission(false);
+        textArea.setEditorKit(kit);
 		textArea.addHyperlinkListener(new HyperlinkListener() {
 	        public void hyperlinkUpdate(HyperlinkEvent e) {
 	            if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {

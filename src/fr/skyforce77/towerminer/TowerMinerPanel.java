@@ -8,6 +8,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.GroupLayout;
@@ -21,6 +23,7 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.text.html.HTMLEditorKit;
 
 public class TowerMinerPanel extends JPanel{
 
@@ -45,6 +48,9 @@ public class TowerMinerPanel extends JPanel{
 		JScrollPane scrollPane = new JScrollPane(textArea);
 		scrollPane.setBackground(new Color(255,255,255,130));
 		textArea.setEditable(false);
+		HTMLEditorKit kit=new HTMLEditorKit();
+		kit.setAutoFormSubmission(false);
+        textArea.setEditorKit(kit);
 		textArea.addHyperlinkListener(new HyperlinkListener() {
 	        public void hyperlinkUpdate(HyperlinkEvent e) {
 	            if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
@@ -61,8 +67,11 @@ public class TowerMinerPanel extends JPanel{
 		add(scrollPane);
 
 		try {
-			textArea.setPage("http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/news.html");
-		}catch (Exception e){
+			textArea.setPage("http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/front.html");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		if(textArea.getText().equals("")) {
 			textArea.setText("Impossible d'afficher le texte\nSi vous etes correctement connecte a Internet,\nceci est probablement en rapport\navec l'apparition d'un nouveau launcher.\nMerci de bien vouloir verifier sur http://www.skyforce77.fr");
 		}
 

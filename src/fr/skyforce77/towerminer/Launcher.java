@@ -35,7 +35,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 	public static String versionurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
 	public static String pagesurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/pages.txt";
 	public static String downloadurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 15;
+	public static int version = 16;
 	public static Launcher instance;
 	public static String actual = "";
 	public static String actualdesc = "";
