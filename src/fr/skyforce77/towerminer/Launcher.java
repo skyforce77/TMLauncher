@@ -32,10 +32,10 @@ import javax.swing.text.PlainDocument;
 public class Launcher extends JFrame implements ClipboardOwner{
 
 	private static final long serialVersionUID = -3444205831495972681L;
-	public static String versionurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
-	public static String pagesurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/pages.txt";
-	public static String downloadurl = "http://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 16;
+	public static String versionurl = "https://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
+	public static String pagesurl = "https://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/pages.txt";
+	public static String downloadurl = "https://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
+	public static int version = 17;
 	public static Launcher instance;
 	public static String actual = "";
 	public static String actualdesc = "";
@@ -43,14 +43,16 @@ public class Launcher extends JFrame implements ClipboardOwner{
 	public static TowerMinerPanel launcherpanel;
 	public static AboutPanel aboutpanel;
 	public static int back = 0;
+	public static boolean downloading = false;
 
 	public static void main(String[] args) {
 		Data.load();
 
 		getDirectory().mkdirs();
+		getWallpaperDirectory().mkdirs();
 
 		verifiyLauncherVersion();
-		back = new Random().nextInt(2);
+		back = new Random().nextInt(12);
 
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -227,6 +229,10 @@ public class Launcher extends JFrame implements ClipboardOwner{
 	public static File getFileVersion() {
 		return new File(getDirectory(), "/launcher/version.txt");
 	}
+	
+	public static File getWallpaperDirectory() {
+		return new File(getDirectory(), "/launcher/wallpapers");
+	}
 
 	public static void setVersion(String version) {
 		try {
@@ -351,7 +357,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 
 	public static void verifiyLauncherVersion() {
 		try {
-			BufferedReader out = new BufferedReader(new InputStreamReader(new URL("http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/version.txt").openStream()));
+			BufferedReader out = new BufferedReader(new InputStreamReader(new URL("https://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/version.txt").openStream()));
 			if(Integer.parseInt(out.readLine()) > version) {
 				int i = JOptionPane.showConfirmDialog(null, "Voulez vous mettre a jour votre launcher?", "Mise a jour du launcher diponible", JOptionPane.YES_NO_OPTION);
 				if(i == JOptionPane.YES_OPTION) {
@@ -420,8 +426,28 @@ public class Launcher extends JFrame implements ClipboardOwner{
 	}
 
 	public static Image getIBackground() {
-		Image image = new ImageIcon(Launcher.class.getResource("/ressources/background"+back+".png")).getImage();
-		return image;
+		File f = new File(getWallpaperDirectory(), "background"+back+".png");
+		if(!f.exists()) {
+			if(!downloading) {
+				downloading = true;
+				new Thread(){
+					public void run() {
+						try {
+							Download.download("https://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/wallpapers/background"+back+".png", getWallpaperDirectory(), "background"+back+".png");
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					};
+				}.start();
+			}
+		} else {
+			try {
+				return new ImageIcon(f.toURI().toURL()).getImage();
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+		return new ImageIcon(Launcher.class.getResource("/ressources/background0.png")).getImage();
 	}
 
 	public static class updateThread extends Thread {

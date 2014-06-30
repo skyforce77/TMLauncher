@@ -67,7 +67,7 @@ public class TowerMinerPanel extends JPanel{
 		add(scrollPane);
 
 		try {
-			textArea.setPage("http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/front.html");
+			textArea.setPage("https://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/front.html");
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

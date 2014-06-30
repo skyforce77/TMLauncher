@@ -101,6 +101,39 @@ public class Download{
 			temp.delete();
 		}
 	}
+	
+	public static void download(String urlf, File directory, String filen) {
+		int count;
+		boolean cancel = false;
+		File temp = new File(Launcher.getDirectory(),"/temp/"+filen);
+		try {
+			URL url = new URL(urlf);
+			URLConnection conection = url.openConnection();
+			conection.connect();
+			InputStream input = new BufferedInputStream(url.openStream(), 8192);
+			OutputStream output = new FileOutputStream(temp);
+
+			byte data[] = new byte[1024];
+
+			while ((count = input.read(data)) != -1 && !cancel) {
+				output.write(data, 0, count);
+			}
+
+			output.flush();
+			output.close();
+			input.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		if(cancel) {
+			temp.delete();
+		} else {
+			move(temp,new File(directory,filen));
+			temp.delete();
+		}
+	}
 
 	@SuppressWarnings("resource")
 	public static void move(File source, File destination) {

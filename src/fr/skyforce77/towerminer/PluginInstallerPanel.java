@@ -41,7 +41,7 @@ public class PluginInstallerPanel extends JPanel{
 			try {
 				ArrayList<Info> i = new ArrayList<Info>();
 				try {
-					final BufferedReader out = new BufferedReader(new InputStreamReader(new URL("http://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/plugins.txt").openStream()));
+					final BufferedReader out = new BufferedReader(new InputStreamReader(new URL("https://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/plugins.txt").openStream()));
 					String line = "";
 					while((line = out.readLine()) != null) {
 						String[] lines = line.split("@");

@@ -12,7 +12,7 @@ public class EditableJTableModel extends AbstractTableModel {
 
 	private ArrayList<Info> infos = new ArrayList<Info>();
 	public static String INSTALLED = "Installe";
-	public static String UPDATE = "Mise a jour disponible";
+	public static String UPDATE = "Mise a jour disponible";
 	public static String DOWNLOAD = "Disponible";
 	 
     private final String[] columns = {"Plugin","Version","Statut"};
