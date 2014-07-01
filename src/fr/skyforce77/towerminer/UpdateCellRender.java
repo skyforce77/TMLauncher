@@ -16,7 +16,7 @@ public class UpdateCellRender extends DefaultTableCellRenderer{
 		String s = value.toString();
 		
 		if(isSelected) {
-			c.setBackground(new Color(0x0FFFFFFA));
+			c.setBackground(Color.LIGHT_GRAY);
 		} else {
 			c.setBackground(Color.WHITE);
 		}

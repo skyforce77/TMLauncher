@@ -4,13 +4,12 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
-
-import javax.swing.ProgressMonitor;
 
 import fr.skyforce77.towerminer.Launcher.updateThread;
 
@@ -19,8 +18,18 @@ public class Download{
 	public static void update(String cause, String add, updateThread torun) {
 		int count;
 		boolean cancel = false;
-		ProgressMonitor monitor = new ProgressMonitor(Launcher.instance, cause, add, 0, 100);
+		if(!add.equals("")) {
+			TowerMinerPanel.setProgressTask(cause+": "+add);
+		} else {
+			TowerMinerPanel.setProgressTask(cause);
+		}
 		File temp = new File(Launcher.getGame().toString().replace(".jar","-temp.jar"));
+		temp.getParentFile().mkdirs();
+		try {
+			temp.createNewFile();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		try {
 			URL url = new URL(Launcher.downloadurl);
 			URLConnection conection = url.openConnection();
@@ -35,9 +44,8 @@ public class Download{
 
 			while ((count = input.read(data)) != -1 && !cancel) {
 				total += count;
-				monitor.setProgress((int)((total*100)/lenghtOfFile));
+				TowerMinerPanel.setProgressTask(100, (int)((total*100)/lenghtOfFile));
 				output.write(data, 0, count);
-				cancel = monitor.isCanceled();
 			}
 
 			output.flush();
@@ -48,7 +56,7 @@ public class Download{
 			e.printStackTrace();
 		}
 
-		monitor.close();
+		TowerMinerPanel.removeProgressTask();
 
 		if(cancel) {
 			temp.delete();
@@ -63,8 +71,14 @@ public class Download{
 	public static void downloadPlugin(String plugin, String version, String urlf) {
 		int count;
 		boolean cancel = false;
-		ProgressMonitor monitor = new ProgressMonitor(Launcher.instance, "Telechargement du plugin", plugin, 0, 100);
+		TowerMinerPanel.setProgressTask("Telechargement du plugin: "+plugin);
 		File temp = new File(Launcher.getDirectory(),"/temp/"+plugin+" v"+version+".jar");
+		temp.getParentFile().mkdirs();
+		try {
+			temp.createNewFile();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		try {
 			URL url = new URL(urlf);
 			URLConnection conection = url.openConnection();
@@ -79,9 +93,8 @@ public class Download{
 
 			while ((count = input.read(data)) != -1 && !cancel) {
 				total += count;
-				monitor.setProgress((int)((total*100)/lenghtOfFile));
+				TowerMinerPanel.setProgressTask(100, (int)((total*100)/lenghtOfFile));
 				output.write(data, 0, count);
-				cancel = monitor.isCanceled();
 			}
 
 			output.flush();
@@ -92,7 +105,7 @@ public class Download{
 			e.printStackTrace();
 		}
 
-		monitor.close();
+		TowerMinerPanel.removeProgressTask();
 
 		if(cancel) {
 			temp.delete();
@@ -106,16 +119,25 @@ public class Download{
 		int count;
 		boolean cancel = false;
 		File temp = new File(Launcher.getDirectory(),"/temp/"+filen);
+		temp.getParentFile().mkdirs();
+		try {
+			temp.createNewFile();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		try {
 			URL url = new URL(urlf);
 			URLConnection conection = url.openConnection();
 			conection.connect();
+			int lenghtOfFile = conection.getContentLength();
 			InputStream input = new BufferedInputStream(url.openStream(), 8192);
 			OutputStream output = new FileOutputStream(temp);
 
 			byte data[] = new byte[1024];
 
+			long total = 0;
 			while ((count = input.read(data)) != -1 && !cancel) {
+				TowerMinerPanel.setProgressTask(100, (int)((total*100)/lenghtOfFile));
 				output.write(data, 0, count);
 			}
 
@@ -126,6 +148,8 @@ public class Download{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		TowerMinerPanel.removeProgressTask();
 
 		if(cancel) {
 			temp.delete();
@@ -139,6 +163,7 @@ public class Download{
 	public static void move(File source, File destination) {
 		try {
 			if(!destination.exists()) {
+				destination.getParentFile().mkdirs();
 				destination.createNewFile();
 			}
 

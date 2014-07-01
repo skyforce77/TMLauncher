@@ -35,7 +35,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 	public static String versionurl = "https://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
 	public static String pagesurl = "https://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/pages.txt";
 	public static String downloadurl = "https://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 18;
+	public static int version = 19;
 	public static Launcher instance;
 	public static String actual = "";
 	public static String actualdesc = "";
@@ -183,6 +183,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 			JOptionPane.showMessageDialog(instance, "Une erreur est survenue,\nelle peut etre causee par une mise a jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
 		}
 		Data.save();
+		Launcher.instance.setVisible(false);
 		instance.dispose();
 		try {
 			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
@@ -432,6 +433,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 				downloading = true;
 				new Thread(){
 					public void run() {
+						TowerMinerPanel.setProgressTask("Telechargement du fond d'ecran");
 						try {
 							Download.download("https://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/wallpapers/background"+back+".png", getWallpaperDirectory(), "background"+back+".png");
 						} catch (Exception e) {

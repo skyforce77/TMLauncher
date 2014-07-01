@@ -16,6 +16,7 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
@@ -29,10 +30,11 @@ public class TowerMinerPanel extends JPanel{
 
 	private static final long serialVersionUID = -8098337044846442718L;
 
-	JEditorPane textArea;
-	JTextField pseudo;
-	JButton play;
-	JButton close;
+	public JEditorPane textArea;
+	public JTextField pseudo;
+	public JButton play;
+	public JButton close;
+	public JProgressBar progressbar;
 	final TowerMinerPanel pn = this;
 
 	@SuppressWarnings("serial")
@@ -126,7 +128,6 @@ public class TowerMinerPanel extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Data.data.player = pseudo.getText();
-				Launcher.instance.setVisible(false);
 				Launcher.launch("ok");
 			}
 		});
@@ -137,6 +138,11 @@ public class TowerMinerPanel extends JPanel{
 		
 		play.setOpaque(false);
 		add(play);
+		
+		progressbar = new JProgressBar();
+		progressbar.setVisible(false);
+		progressbar.setStringPainted(true);
+		add(progressbar);
 
 		layout.setVerticalGroup(
 				layout.createSequentialGroup()
@@ -146,11 +152,13 @@ public class TowerMinerPanel extends JPanel{
 						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
 								.addComponent(dl, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
 								.addComponent(pseudo, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
-								.addComponent(play, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+								.addComponent(play, 30, 35, GroupLayout.PREFERRED_SIZE)
+								.addComponent(progressbar, 30, 35, GroupLayout.PREFERRED_SIZE)
 				);
 
 		layout.setHorizontalGroup(layout.createParallelGroup()
 				.addComponent(scrollPane)
+				.addComponent(progressbar, 500, 550, Integer.MAX_VALUE)
 				.addGroup(layout.createSequentialGroup().addComponent(dl).addComponent(pseudo))
 				.addComponent(play, 500, 550, Integer.MAX_VALUE));
 		setVisible(true);
@@ -161,5 +169,23 @@ public class TowerMinerPanel extends JPanel{
 	public void paint(Graphics g) {
 		g.drawImage(Launcher.getIBackground(), 0, 0, pn.getWidth(), pn.getHeight(), null);
 		super.paint(g);
+	}
+	
+	public static void setProgressTask(String task) {
+		Launcher.launcherpanel.progressbar.setString(task);
+		Launcher.launcherpanel.play.setVisible(false);
+		Launcher.launcherpanel.progressbar.setVisible(true);
+	}
+	
+	public static void removeProgressTask() {
+		Launcher.launcherpanel.progressbar.setString("");
+		Launcher.launcherpanel.progressbar.setValue(0);
+		Launcher.launcherpanel.play.setVisible(true);
+		Launcher.launcherpanel.progressbar.setVisible(false);
+	}
+	
+	public static void setProgressTask(int max, int progress) {
+		Launcher.launcherpanel.progressbar.setValue(progress);
+		Launcher.launcherpanel.progressbar.setMaximum(max);
 	}
 }
