@@ -35,7 +35,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 	public static String versionurl = "https://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
 	public static String pagesurl = "https://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/pages.txt";
 	public static String downloadurl = "https://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 19;
+	public static int version = 20;
 	public static Launcher instance;
 	public static String actual = "";
 	public static String actualdesc = "";
@@ -96,22 +96,13 @@ public class Launcher extends JFrame implements ClipboardOwner{
 
 		launcherpanel = new TowerMinerPanel();
 		tabs.addTab("TowerMiner", getTowerMinerIcon(), launcherpanel);
-		tabs.addTab("PluginInstaller", getIcon("lock"), new PluginInstallerPanel());
-		tabs.addTab("HtmlEdit", getIcon("enchant"), new HTMLEditPanel());
-		
 		instance.setVisible(true);
 
 		new Thread(){
 			public void run() {
+				tabs.addTab("PluginInstaller", getIcon("lock"), new PluginInstallerPanel());
+				tabs.addTab("HtmlEdit", getIcon("enchant"), new HTMLEditPanel());
 				createPages();
-				int i = tabs.getSelectedIndex();
-				tabs.setSelectedIndex(1);
-				try {
-					Thread.sleep(1l);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				tabs.setSelectedIndex(i);
 			};
 		}.start();
 
@@ -119,7 +110,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 			public void run() {
 				while(instance.isVisible()) {
 					try {
-						Thread.sleep(1l);
+						Thread.sleep(10l);
 						instance.repaint();
 					} catch (InterruptedException e) {}
 				}
@@ -185,10 +176,6 @@ public class Launcher extends JFrame implements ClipboardOwner{
 		Data.save();
 		Launcher.instance.setVisible(false);
 		instance.dispose();
-		try {
-			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-		} catch (Exception e) {
-		}
 	}
 
 	public static File getDirectory() {

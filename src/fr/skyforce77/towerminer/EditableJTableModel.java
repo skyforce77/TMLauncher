@@ -24,6 +24,11 @@ public class EditableJTableModel extends AbstractTableModel {
     public EditableJTableModel(ArrayList<Info> infos) {
         super();
         this.infos = infos;
+        for(Info i : infos) {
+        	try {
+        		getStatus(i);
+        	} catch(Exception e) {}
+        }
     }
  
     public int getRowCount() {
@@ -51,7 +56,7 @@ public class EditableJTableModel extends AbstractTableModel {
         }
     }
     
-    public String getStatus(Info i) {
+    public String getStatus(final Info i) {
     	File d = new File(Launcher.getDirectory(), "/plugins");
     	boolean exists = false;
     	boolean update = true;
@@ -66,7 +71,11 @@ public class EditableJTableModel extends AbstractTableModel {
     	if(exists) {
     		if(update && !PluginInstallerPanel.notified.contains(i.plugin)) {
     			PluginInstallerPanel.notified.add(i.plugin);
-    			JOptionPane.showMessageDialog(null, "Mise a jour disponible\nPlugin: "+i.plugin+"\nVersion: "+i.version,"Information",JOptionPane.INFORMATION_MESSAGE);
+    			new Thread("LauncherPopup-Plugin-"+i.plugin) {
+    				public void run() {
+    					JOptionPane.showMessageDialog(null, "Mise a jour disponible\nPlugin: "+i.plugin+"\nVersion: "+i.version,"Information", JOptionPane.PLAIN_MESSAGE);
+    				};
+    			}.start();
     			Launcher.tabs.setSelectedIndex(1);
     		}
     		return update ? UPDATE : INSTALLED;

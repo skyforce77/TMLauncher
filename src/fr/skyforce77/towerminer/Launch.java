@@ -7,12 +7,17 @@ import java.net.URLClassLoader;
 import java.util.UUID;
 
 import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 
 public class Launch {
 
 	public static void launch(String tmversion, String arg) throws Exception{
 		addURLToSystemClassLoader(Launcher.getGame().toURI().toURL());
 		Class<?> cls = ClassLoader.getSystemClassLoader().loadClass("fr.skyforce77.towerminer.TowerMiner");
+		try {
+			UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+		} catch (Exception e) {
+		}
 		if(!launch_A_07(arg, cls) && !launch_A_08(arg, cls) && !launch_B_03(arg, cls)) {
 			JOptionPane.showMessageDialog(null, "Une erreur est survenue,\nelle peut Etre causee par une mise a jour du launcher requise.","Information",JOptionPane.ERROR_MESSAGE);
 		}
