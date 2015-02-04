@@ -45,7 +45,6 @@ public class TowerMinerPanel extends JPanel{
 		setSize(new Dimension(600,400));
 		setBackground(new Color(255,255,255,125));
 		textArea = new JEditorPane();
-		textArea.setContentType("text/html");
 		textArea.setBackground(new Color(0, 0, 0, 0));
 		JScrollPane scrollPane = new JScrollPane(textArea);
 		scrollPane.setBackground(new Color(255,255,255,130));
@@ -56,12 +55,18 @@ public class TowerMinerPanel extends JPanel{
 		textArea.addHyperlinkListener(new HyperlinkListener() {
 	        public void hyperlinkUpdate(HyperlinkEvent e) {
 	            if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-		            if(Desktop.isDesktopSupported()) {
+		            if(Desktop.isDesktopSupported() && !e.getURL().getPath().startsWith("https://dl.dropboxusercontent.com/u/38885163/")) {
 		                try {
 		                    Desktop.getDesktop().browse(e.getURL().toURI());
 		                } catch (Exception e1) {
 		                    e1.printStackTrace();
 		                }
+		            } else {
+		            	try {
+							textArea.setPage(e.getURL());
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
 		            }
 	            }
 	        }

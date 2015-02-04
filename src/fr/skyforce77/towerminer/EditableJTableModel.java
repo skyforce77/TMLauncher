@@ -15,7 +15,7 @@ public class EditableJTableModel extends AbstractTableModel {
 	public static String UPDATE = "Mise a jour disponible";
 	public static String DOWNLOAD = "Disponible";
 	 
-    private final String[] columns = {"Plugin","Version","Statut"};
+    private final String[] columns = {"Plugin","Version","Auteur","Statut"};
  
     public EditableJTableModel() {
         super();
@@ -50,6 +50,8 @@ public class EditableJTableModel extends AbstractTableModel {
             case 1:
                 return infos.get(rowIndex).version;
             case 2:
+                return infos.get(rowIndex).auteur;
+            case 3:
                 return getStatus(infos.get(rowIndex));
             default:
                 return null;
@@ -61,7 +63,7 @@ public class EditableJTableModel extends AbstractTableModel {
     	boolean exists = false;
     	boolean update = true;
     	for(File f : d.listFiles()) {
-    		if(f.getName().contains(i.plugin)) {
+    		if(f.getName().contains(i.plugin) && !f.isDirectory()) {
     			exists = true;
     			if(f.getName().contains(i.version)) {
     				update = false;
@@ -89,7 +91,7 @@ public class EditableJTableModel extends AbstractTableModel {
     	boolean exists = false;
     	boolean update = true;
     	for(File f : d.listFiles()) {
-    		if(f.getName().contains(i.plugin)) {
+    		if(f.getName().contains(i.plugin) && !f.isDirectory()) {
     			exists = true;
     			if(f.getName().contains(i.version)) {
     				update = false;
@@ -103,8 +105,8 @@ public class EditableJTableModel extends AbstractTableModel {
     	}
     }
  
-    public void addSite(String plugin, String version, String url) {
-        infos.add(new Info(plugin, version, url));
+    public void addSite(String plugin, String version, String auteur, String url) {
+        infos.add(new Info(plugin, version, auteur, url));
         fireTableRowsInserted(infos.size()-1, infos.size()-1);
     }
  
@@ -115,11 +117,12 @@ public class EditableJTableModel extends AbstractTableModel {
     
     public static class Info implements Serializable{
 		private static final long serialVersionUID = 7298260662741896214L;
-		public String plugin,version,url;
+		public String plugin,version,auteur,url;
     	
-    	public Info(String plugin, String version,String url) {
+    	public Info(String plugin, String version, String auteur, String url) {
     		this.plugin = plugin;
     		this.version = version;
+    		this.auteur = auteur;
     		this.url = url;
     	}
     }

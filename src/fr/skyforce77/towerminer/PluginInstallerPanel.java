@@ -45,7 +45,7 @@ public class PluginInstallerPanel extends JPanel{
 					String line = "";
 					while((line = out.readLine()) != null) {
 						String[] lines = line.split("@");
-						i.add(new Info(lines[0], lines[1], lines[2]));
+						i.add(new Info(lines[0], lines[1], lines[3], lines[2]));
 					}
 				} catch(Exception e) {}
 				table = new JTable(new EditableJTableModel(i));
@@ -151,7 +151,7 @@ public class PluginInstallerPanel extends JPanel{
 				    	}
 						Info i = ((EditableJTableModel)table.getModel()).getInfos().get(s);
 						((EditableJTableModel)table.getModel()).removeSite(s);
-						((EditableJTableModel)table.getModel()).addSite(i.plugin, i.version, i.url);
+						((EditableJTableModel)table.getModel()).addSite(i.plugin, i.version, i.auteur, i.url);
 					}
 				}
 			});

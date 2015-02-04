@@ -35,7 +35,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 	public static String versionurl = "https://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/version.txt";
 	public static String pagesurl = "https://dl.dropboxusercontent.com/u/38885163/TowerMiner/launcher/pages.txt";
 	public static String downloadurl = "https://dl.dropboxusercontent.com/u/38885163/TowerMiner/version/TowerMiner.jar";
-	public static int version = 20;
+	public static int version = 21;
 	public static Launcher instance;
 	public static String actual = "";
 	public static String actualdesc = "";
@@ -49,6 +49,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 		Data.load();
 
 		getDirectory().mkdirs();
+		new File(Launcher.getDirectory(), "/plugins").mkdirs();
 		getWallpaperDirectory().mkdirs();
 
 		verifiyLauncherVersion();
@@ -88,7 +89,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 		instance.setSize(new Dimension(700,500));
 		instance.setLocationRelativeTo(null);
 		instance.setMinimumSize(instance.getSize());
-		instance.setTitle("Skyforce77's launcher (v"+version+")");
+		instance.setTitle("TowerMiner launcher (v"+version+")");
 
 		tabs = new JTabbedPane();
 
@@ -100,8 +101,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 
 		new Thread(){
 			public void run() {
-				tabs.addTab("PluginInstaller", getIcon("lock"), new PluginInstallerPanel());
-				tabs.addTab("HtmlEdit", getIcon("enchant"), new HTMLEditPanel());
+				tabs.addTab("Plugin Installer", getIcon("lock"), new PluginInstallerPanel());
 				createPages();
 			};
 		}.start();
@@ -258,7 +258,7 @@ public class Launcher extends JFrame implements ClipboardOwner{
 			while((line = out.readLine()) != null) {
 				String s = line;
 				try {
-					if(s != null && s != "" && !s.startsWith("//") && s.startsWith("page")) {
+					if(s != null && s.startsWith("page")) {
 						String balise = s.split("=")[0];
 						String name = s.split("=")[1];
 						aboutpanel = new AboutPanel(s.replace(balise+"="+name+"=",""));
